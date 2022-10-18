@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: gitserver
+  name: gitserver
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      deployment: gitserver
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        deployment: gitserver
+    spec:
+      serviceAccountName: gitserver
+      securityContext:
+        runAsUser: 1000
+        fsGroup: 1000
+      restartPolicy: Always
+      volumes:
+      - name: shared
+        emptyDir: {}
+      - name: repos
+        persistentVolumeClaim:
+          claimName: repos
+      - name: hostkeys
+        secret:
+          secretName: hostkeys
+          defaultMode: 0440
+      - name: sshd-config
+        configMap:
+          name: sshd-config
+          defaultMode: 0440
+      initContainers:
+      - name: install-files
+        image: image-registry.openshift-image-registry.svc:5000/tools/gitserver:1.0.0
+        imagePullPolicy: IfNotPresent
+        command:
+        - bash
+        - -c
+        - |
+          cp /hostkeys/* /shared/ && chmod 0700 /shared/* ;
+          if [ ! -d /home/git/repos/dotnet.git ]; then git init --bare /home/git/repos/dotnet.git ; fi
+        args: []
+        volumeMounts:
+        - name: shared
+          mountPath: /shared
+        - name: repos
+          mountPath: /home/git/repos
+        - name: hostkeys
+          mountPath: /hostkeys
+        - name: sshd-config
+          mountPath: /home/git/.gitconfig
+          subPath: .gitconfig
+      containers:
+      - name: gitserver
+        image: image-registry.openshift-image-registry.svc:5000/tools/gitserver:1.0.0
+        imagePullPolicy: IfNotPresent
+        resources: {}
+        volumeMounts:
+        - name: shared
+          mountPath: /home/git/hostkeys
+        - name: repos
+          mountPath: /home/git/repos
+        - name: sshd-config
+          mountPath: /home/git/.ssh/authorized_keys
+          subPath: authorized_keys
+        - name: sshd-config
+          mountPath: /home/git/sshd_config
+          subPath: sshd_config
+        - name: sshd-config
+          mountPath: /home/git/.gitconfig
+          subPath: .gitconfig

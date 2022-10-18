@@ -1,0 +1,42 @@
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  labels:
+    build: gitserver
+  name: gitserver
+spec:
+  output:
+    to:
+      kind: ImageStreamTag
+      name: gitserver:1.0.0
+  resources: {}
+  runPolicy: Serial
+  source:
+    type: Dockerfile
+    dockerfile: |
+      FROM registry.access.redhat.com/ubi9-minimal:latest
+      USER 0
+      RUN microdnf -y install --nodocs openssh-server git && microdnf clean all && \
+        adduser --shell /usr/bin/git-shell --comment 'Git' --groups 0 git && \
+        chpasswd <<<'git:12345' && \
+        mkdir -p /home/git/hostkeys && \
+        mkdir --mode 700 /home/git/.ssh
+
+      RUN \
+        mkdir /home/git/git-shell-commands && \
+        echo "printf '%s\n' 'Successful login but no interactive shell access is allowed'" > /home/git/git-shell-commands/no-interactive-login && \
+        git config --global init.defaultBranch main && \
+        chown -R git:0 /home/git && \
+        chmod 700 /home/git/.ssh/ /home/git/git-shell-commands/no-interactive-login
+
+      USER git:0
+      WORKDIR /home/git
+      ENTRYPOINT [ "/usr/sbin/sshd", "-D", "-f", "/home/git/sshd_config", "-e" ]
+      EXPOSE 2022
+  strategy:
+    type: Docker
+    dockerStrategy:
+      from:
+        kind: DockerImage
+        name: registry.access.redhat.com/ubi9-minimal:latest 
+  triggers: []

@@ -1,0 +1,14 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- namespace.yaml
+- hostkeys.yaml
+- sshd-config.yaml
+- sa.yaml
+- rolebinding.yaml
+- is.yaml
+- bc.yaml
+- pvc.yaml
+- deploy.yaml
+- svc.yaml

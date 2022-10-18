@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cluster-config
+  namespace: openshift-gitops
+  # finalizers:
+  # - resources-finalizer.argocd.argoproj.io # cascade delete resources with Application
+spec:
+  destination:
+    namespace: openshift-gitops
+    server: https://kubernetes.default.svc
+  project: cluster-config
+  source:
+    path: clusters/overlays/REPLACE_ME
+    repoURL: git@github.com:linjan2/cluster-config.git
+    targetRevision: main
+  syncPolicy:
+    automated:
+      prune: false
+      selfHeal: false
+    syncOptions:
+    - PrunePropagationPolicy=foreground

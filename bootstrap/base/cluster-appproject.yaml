@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: cluster-config
+  namespace: openshift-gitops
+spec:
+  clusterResourceWhitelist:
+  - group: '*'
+    kind: '*'
+  namespaceResourceWhitelist:
+  - group: '*'
+    kind: '*'
+  destinations:
+  - namespace: openshift-*
+    server: https://kubernetes.default.svc
+  sourceRepos:
+  - git@github.com:linjan2/cluster-config.git
+  - ssh://git@github.com:22/linjan2/cluster-config.git
+  - https://github.com/linjan2/cluster-config.git

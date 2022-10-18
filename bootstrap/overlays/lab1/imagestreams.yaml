@@ -1,0 +1,20 @@
+---
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: ksops
+  namespace: openshift-gitops
+spec:
+  lookupPolicy:
+    local: true
+  tags:
+  - annotations: null
+    from:
+      kind: DockerImage
+      name: docker.io/viaductoss/ksops:v3.0.2
+    generation: 1
+    importPolicy: {}
+    name: v3.0.2
+    referencePolicy:
+      type: Local
+---

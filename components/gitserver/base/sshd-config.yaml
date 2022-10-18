@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sshd-config
+data:
+  .gitconfig: |
+    [init]
+      defaultBranch = main
+  authorized_keys: |
+    ssh-ed25519 ... user-pubkey1
+    ssh-rsa ... user-pubkey2
+  sshd_config: |
+    Port 2022
+    HostKey /home/git/hostkeys/ssh_host_rsa_key
+    HostKey /home/git/hostkeys/ssh_host_ecdsa_key
+    HostKey /home/git/hostkeys/ssh_host_ed25519_key
+    LogLevel DEBUG3
+    ChallengeResponseAuthentication no
+    X11Forwarding yes
+    PrintMotd no
+    PidFile /home/git/sshd.pid
+    AcceptEnv LANG LC_*
+    Subsystem sftp /usr/lib/openssh/sftp-server
