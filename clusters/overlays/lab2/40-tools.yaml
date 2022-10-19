@@ -1,17 +1,17 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: cluster-config
+  name: tools
   namespace: openshift-gitops
-  # finalizers:
-  # - resources-finalizer.argocd.argoproj.io # cascade delete resources with Application
+  annotations:
+    argocd.argoproj.io/sync-wave: '40'
 spec:
   destination:
     namespace: openshift-gitops
     server: https://kubernetes.default.svc
   project: cluster-config
   source:
-    path: REPLACE_ME
+    path: components/tools/overlays/lab2
     repoURL: ssh://git@gitserver.tools.svc:2022/home/git/repos/bootstrap.git
     targetRevision: main
   syncPolicy:
@@ -20,4 +20,4 @@ spec:
       prune: false
       selfHeal: false
     syncOptions:
-    - PrunePropagationPolicy=foreground
+      - PrunePropagationPolicy=foreground

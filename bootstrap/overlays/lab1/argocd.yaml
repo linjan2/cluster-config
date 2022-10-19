@@ -102,7 +102,7 @@ spec:
     provider: dex
   tls:
     ca: {}
-    # initialCerts:
+    initialCerts: {}
     #   server.example.com: -----BEGIN CERTIFICATE----- ...
 
   initialSSHKnownHosts:

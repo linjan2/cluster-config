@@ -102,7 +102,7 @@ spec:
     provider: dex
   tls:
     ca: {}
-    # initialCerts:
+    initialCerts: {}
     #   server.example.com: -----BEGIN CERTIFICATE----- ...
 
   initialSSHKnownHosts:
@@ -111,24 +111,27 @@ spec:
       github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl
       github.com ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==
       github.com ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBEmKSENjQEezOmxkZMy7opKgwFB9nkt5YRrYMjNuG5N87uRgg6CLrbo5wAdT/y6v0mKV0U2w0WZ2YB/++Tpockg=
+      [gitserver.tools.svc]:2022 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINTsvYHLI7Uz/3SiFsBvn+XPuJz0je7FLOtW6OSSnYj4
+      [gitserver.tools.svc]:2022 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCZ+9EldN/8pBkvn5fqbf6+WhNJbTpM5sIj3weDw+kbBgOztbUdJmDP4fIyak4TflARKstLPmeiChZWUgUhZj0pJ+rWKAT4+xImGznfketEEGia1er8wv0wfofATBo6kp+7htnJBOqlEkhhMuZ8XkjAJDa91oQeQ3nWwJmwaL2fL2LC0Aaf2mkweA14rkN9P+Ps4Fvgaap8CB6WlLWFDyn3LrM9/qRNO2w1aNlLcc5FC0eSgrQG8yVlZMC6sMvJRKz69iE+/qDWGJixdQT7+vZbTi8VjjuLfyMOTzD9pEYgDRyBHRlZ48t0S6uSAcjgNGlldtYtDbQItOCvNjxtFX1jAbi8RHur0kWhO96bMxqDS2OlJT+HqCFRRMteCbZr7CgUeqm9kF2XCTUyCQYpe88b9/xwowf8clO/iMU9AOgZB88KaLcNd0CPdULrtIL0yO9OWYGrngW32IoIoE5xTHFedTRFWpUpWYsn6k9Vx1o7yQW4SPjaW7aemJGhm8yR1/E=
+      [gitserver.tools.svc]:2022 ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBKukF9lJxYjq24GXLfOSFWFsh9oK7eyYgsujtCd1eXDkmCHppbQRL+DtbcZGlk3TkXIK/qke9StQ6dGxOeRpd+g=
   kustomizeBuildOptions: ''
   # Add health assessment for Applications to use them with sync waves for app-of-apps
   # https://argo-cd.readthedocs.io/en/stable/operator-manual/upgrading/1.7-1.8/#health-assessment-of-argoprojioapplication-crd-has-been-removed
   # https://github.com/argoproj/argo-cd/issues/3781
-  resourceCustomizations: |
-    health.lua: |
-        hs = {}
-        hs.status = "Progressing"
-        hs.message = ""
-        if obj.status ~= nil then
-          if obj.status.health ~= nil then
-            hs.status = obj.status.health.status
-            if obj.status.health.message ~= nil then
-              hs.message = obj.status.health.message
-            end
-          end
-        end
-        return hs
+  # resourceCustomizations: |
+  #   health.lua: |
+  #       hs = {}
+  #       hs.status = "Progressing"
+  #       hs.message = ""
+  #       if obj.status ~= nil then
+  #         if obj.status.health ~= nil then
+  #           hs.status = obj.status.health.status
+  #           if obj.status.health.message ~= nil then
+  #             hs.message = obj.status.health.message
+  #           end
+  #         end
+  #       end
+  #       return hs
   repo:
     resources:
       limits:
@@ -141,7 +144,6 @@ spec:
     defaultPolicy: role:readonly
     policy: |
       g, system:cluster-admins, role:admin
-      g, system:authenticated:oauth, role:read-only
-      g, system:authenticated, role:read-only
-      g, user1, role:admin
+      g, ocp-admin, role:admin
+      g, linda, role:admin
     scopes: "[accounts, groups]"

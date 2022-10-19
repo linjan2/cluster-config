@@ -4,5 +4,36 @@ kind: Kustomization
 bases:
 - ../../base
 
-# resources:
-# - 
+resources:
+- 00-unsorted.yaml
+- 10-storage.yaml
+- 20-rbac.yaml
+- 30-operators.yaml
+- 40-tools.yaml
+
+# patches:
+# - target:
+#     kind: argoproj.io
+#     group: v1alpha1
+#     name: default
+#     namespace: openshift-gitops
+#   patch: |-
+#     - op: replace
+#       path: /spec/clusterResourceWhitelist
+#       value: []
+#     - op: replace
+#       path: /spec/namespaceResourceWhitelist
+#       value: []
+#     - op: replace
+#       path: /spec/clusterResourceBlacklist
+#       value:
+#         - group: '*'
+#           kind: '*'
+#     - op: replace
+#       path: /spec/namespaceResourceBlacklist
+#       value:
+#         - group: '*'
+#           kind: '*'
+#     - op: replace
+#       path: /spec/sourceRepos
+#       value: []

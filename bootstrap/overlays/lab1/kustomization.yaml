@@ -12,8 +12,16 @@ patches:
 - target:
     kind: Application
     group: argoproj.io
+    name: bootstrap
+  patch: |-
+    - op: replace
+      path: /spec/source/path
+      value: bootstrap/overlays/lab1
+- target:
+    kind: Application
+    group: argoproj.io
     name: cluster-config
   patch: |-
     - op: replace
       path: /spec/source/path
-      value: lab1
+      value: clusters/overlays/lab1
