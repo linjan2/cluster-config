@@ -1,32 +1,18 @@
 # cluster-config
 
-Bootstrap sets up:
+manual steps:
 
-- git credentials for Argo CD
-- the encryption keys for encrypted secret data
-- the bootstrap application
+- create the argocd namespace for the OpenShift GitOps operator.
+- create secret with git private key for Argo CD, annotated with `argocd.argoproj.io/secret-type: repo-creds` in the argocd installed-to namespace.
+- run `ssh-keyscan -p PORT HOST` to get known_host for the git server and add to `ArgoCD.spec.initialSSHKnownHosts`.
+- create the sops encryption keys for encrypted secret data in a secret in the argocd installed-to namespace.
+- apply the bootstrap overlay.
 
-OpenShift GitOps operator must be installed.
 
-Creating the bootstrap application starts the synchronization chain for resources.
-
-```
-bootstrap application -> cluster-config "app of apps" -> x cluster applications
-```
+Applying the bootstrap overlay creates the cluster `Application`, which triggers Argo CD to synchronize all other resources.
 
 To bootstrap, run either of:
 
 ```sh
-oc apply -k bootstrap/overlays/lab1
-kustomize build bootstrap/overlays/lab1 | oc apply -f -
+oc apply -k clusters/overlays/boostrap
 ```
-
-The cluster application uses sync-waves to create its applications in order:
-
-- 0: default when sync-wave annotation is missing
-- 10: Storage, storageclasses
-- 20: RBAC
-- 30: operators
-- 40: operator CRDs
-- 50: tool applications
-- 60: tenants

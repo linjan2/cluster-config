@@ -1,0 +1,145 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ArgoCD
+metadata:
+  finalizers:
+  - argoproj.io/finalizer
+  name: openshift-gitops
+  namespace: openshift-gitops
+spec:
+  applicationSet:
+    resources:
+      limits:
+        cpu: "2"
+        memory: 1Gi
+      requests:
+        cpu: 250m
+        memory: 512Mi
+  controller:
+    processors: {}
+    resources:
+      limits:
+        cpu: "2"
+        memory: 2Gi
+      requests:
+        cpu: 250m
+        memory: 1Gi
+    sharding: {}
+  grafana:
+    enabled: false
+    ingress:
+      enabled: false
+    resources:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+      requests:
+        cpu: 250m
+        memory: 128Mi
+    route:
+      enabled: false
+  ha:
+    enabled: false
+    resources:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+      requests:
+        cpu: 250m
+        memory: 128Mi
+  notifications:
+    enabled: false
+  prometheus:
+    enabled: false
+    ingress:
+      enabled: false
+    route:
+      enabled: false
+  redis:
+    resources:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+      requests:
+        cpu: 250m
+        memory: 128Mi
+  resourceExclusions: |
+    - apiGroups:
+      - tekton.dev
+      clusters:
+      - '*'
+      kinds:
+      - TaskRun
+      - PipelineRun
+  server:
+    autoscale:
+      enabled: false
+    grpc:
+      ingress:
+        enabled: false
+    ingress:
+      enabled: false
+    resources:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+      requests:
+        cpu: 125m
+        memory: 128Mi
+    route:
+      enabled: true
+    service:
+      type: ""
+  sso:
+    dex:
+      openShiftOAuth: true
+      resources:
+        limits:
+          cpu: 500m
+          memory: 256Mi
+        requests:
+          cpu: 250m
+          memory: 128Mi
+    provider: dex
+  tls:
+    ca: {}
+    initialCerts: {}
+    #   server.example.com: -----BEGIN CERTIFICATE----- ...
+
+  initialSSHKnownHosts:
+    excludedefaulthosts: true
+    keys: |
+      [openshift-ts.infra.local]:10022 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDC0CF7TX+D+e3rYUNhijzcpjJmB9jWvvKS1bgKDN5zE9y61/xDaO9P6IkXUvfp5iX3g3pmKEf9I4uzPymBiMkCWD6sGkFDsYMh9eyiJfrdVLQF3Ez/PmdlByu4wBQz5g7ukja6MdfBNZhEF0JhzVvm4F28V6/Z5ri/7Q9gIjsad8smbpAJmdHs89D8dkWdcKzw4qA/YZ7WNp7jezDLbFn3fvilrAnrtPnyal5tug87BNFTnUYIaJO/2aN1i+6JbGVxn3KBZEDsiTgCeZqqijPvs4CqgZ6z+qXvoDUewpm3iTiOfyWBSg58trk8lJJ0WVzqzbU1hs/DWTaq8fBJFLf3tpEVrk3b7tHpmOAq1YXaHHfslPRaPlkUUSoXm/nj80K5GUKtfNOzOLssydYhfQOIhh+wgFeByB1mJspXC5sAF34odSq603bOc9ySZPmdfzS61Vb6P852EerlTI+dmesodGBwvE/8f1qM5sHU3eroUYF8yHDkKgLFXwbC7B0Jz1s=
+      [openshift-ts.infra.local]:10022 ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBH1yAfHeplvP+hWCAOZMChBfV8cUxOJ6eDG2dQtUOkgPZpIuSvFz/An35gCSwLLbMEsymL12KKSCx4vV3hrJAfA=
+      [openshift-ts.infra.local]:10022 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMu6V0KNIMmuGRYP8PdkQpaTOCFSnLVuAHg9SebKFOuP
+  kustomizeBuildOptions: ''
+  # Add health assessment for Applications to use them with sync waves for app-of-apps
+  # https://argo-cd.readthedocs.io/en/stable/operator-manual/upgrading/1.7-1.8/#health-assessment-of-argoprojioapplication-crd-has-been-removed
+  # https://github.com/argoproj/argo-cd/issues/3781
+  # resourceCustomizations: |
+  #   health.lua: |
+  #       hs = {}
+  #       hs.status = "Progressing"
+  #       hs.message = ""
+  #       if obj.status ~= nil then
+  #         if obj.status.health ~= nil then
+  #           hs.status = obj.status.health.status
+  #           if obj.status.health.message ~= nil then
+  #             hs.message = obj.status.health.message
+  #           end
+  #         end
+  #       end
+  #       return hs
+  repo:
+    resources:
+      limits:
+        cpu: "1"
+        memory: 1Gi
+      requests:
+        cpu: 250m
+        memory: 256Mi
+  rbac:
+    defaultPolicy: role:readonly
+    policy: |
+      g, system:cluster-admins, role:admin
+      g, ocp-admin, role:admin
+    scopes: "[accounts, groups]"

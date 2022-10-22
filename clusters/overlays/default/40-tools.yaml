@@ -1,0 +1,47 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: tools
+  namespace: openshift-gitops
+  annotations:
+    argocd.argoproj.io/sync-wave: '40'
+spec:
+  # must whitelist creation of namespace
+  clusterResourceWhitelist:
+  - group: ''
+    kind: Namespace
+  namespaceResourceWhitelist:
+  - group: '*'
+    kind: '*'
+  destinations:
+  - namespace: tools
+    server: https://kubernetes.default.svc
+  sourceRepos:
+  - ssh://git@gitserver.tools.svc:2022/home/git/repos/cluster-config.git
+
+---
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: tools
+  namespace: openshift-gitops
+  annotations:
+    argocd.argoproj.io/sync-wave: '40'
+spec:
+  destination:
+    namespace: tools
+    server: https://kubernetes.default.svc
+  project: tools
+  source:
+    path: components/tools/overlays/default
+    repoURL: ssh://git@gitserver.tools.svc:2022/home/git/repos/cluster-config.git
+    targetRevision: main
+  syncPolicy:
+    automated:
+      allowEmpty: true
+      #prune: false
+      #selfHeal: false
+    syncOptions:
+    - CreateNamespace=true
+    - PrunePropagationPolicy=foreground

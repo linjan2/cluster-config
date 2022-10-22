@@ -1,0 +1,7 @@
+kind: Scheduler
+metadata:
+  name: cluster
+spec:
+  mastersSchedulable: false
+  policy:
+    name: ""
