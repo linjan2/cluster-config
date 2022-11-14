@@ -1,0 +1,47 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: cluster
+  namespace: openshift-gitops
+  annotations:
+    argocd.argoproj.io/sync-wave: '0'
+spec:
+  clusterResourceWhitelist:
+  - group: '*'
+    kind: '*'
+  namespaceResourceWhitelist:
+  - group: '*'
+    kind: '*'
+  destinations:
+  - namespace: '*'
+    server: https://kubernetes.default.svc
+  sourceRepos:
+  - ssh://git@gitserver.tools.svc:2022/home/git/repos/cluster-config.git
+
+---
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cluster
+  namespace: openshift-gitops
+  annotations:
+    argocd.argoproj.io/sync-wave: '0'
+  # finalizers:
+  # - resources-finalizer.argocd.argoproj.io # cascade delete resources with Application
+spec:
+  destination:
+    namespace: openshift-gitops
+    server: https://kubernetes.default.svc
+  project: cluster
+  source:
+    path: components/argocd-cluster/overlays/default # manage self
+    repoURL: ssh://git@gitserver.tools.svc:2022/home/git/repos/cluster-config.git
+    targetRevision: main
+  syncPolicy:
+    automated:
+      allowEmpty: true
+      #prune: true
+      #selfHeal: true
+    syncOptions:
+    - PrunePropagationPolicy=foreground

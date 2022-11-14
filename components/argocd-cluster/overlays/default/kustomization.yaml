@@ -5,12 +5,13 @@ bases:
 - ../../base
 
 resources:
-- application-dummy.yaml
+- application-oauth.yaml
+- application-argocd-applications.yaml
 
 patches:
-- path: argocd-argocd-applications-patch.yaml
+- path: argocd-openshift-gitops-patch.yaml
   target:
     group: argoproj.io
     version: v1alpha1
     kind: ArgoCD
-    name: argocd-applications
+    name: openshift-gitops

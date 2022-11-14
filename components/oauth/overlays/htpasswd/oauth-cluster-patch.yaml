@@ -1,0 +1,23 @@
+- op: add
+  path: /spec/identityProviders/-
+  value:
+    type: LDAP
+    name: ldapidp
+    mappingMethod: claim
+    ldap:
+      attributes:
+        email:
+        - mail
+        id:
+        - dn
+        name:
+        - cn
+        preferredUsername:
+        - uid
+      bindDN: uid=system_read,cn=sysaccounts,cn=etc,dc=sfo,dc=lo
+      bindPassword:
+        name: ldap-secret
+      ca:
+        name: ca-config-map
+      insecure: false
+      url: ldaps://sdl1-ipa.sfo.lo/cn=users,cn=accounts,dc=sfo,dc=lo?uid?sub?(uid=*)

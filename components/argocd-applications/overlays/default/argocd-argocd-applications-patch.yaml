@@ -1,0 +1,33 @@
+- op: replace
+  path: /spec/initialSSHKnownHosts/keys
+  value: |
+    [gitserver.tools.svc]:2022 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINTsvYHLI7Uz/3SiFsBvn+XPuJz0je7FLOtW6OSSnYj4
+    [gitserver.tools.svc]:2022 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCZ+9EldN/8pBkvn5fqbf6+WhNJbTpM5sIj3weDw+kbBgOztbUdJmDP4fIyak4TflARKstLPmeiChZWUgUhZj0pJ+rWKAT4+xImGznfketEEGia1er8wv0wfofATBo6kp+7htnJBOqlEkhhMuZ8XkjAJDa91oQeQ3nWwJmwaL2fL2LC0Aaf2mkweA14rkN9P+Ps4Fvgaap8CB6WlLWFDyn3LrM9/qRNO2w1aNlLcc5FC0eSgrQG8yVlZMC6sMvJRKz69iE+/qDWGJixdQT7+vZbTi8VjjuLfyMOTzD9pEYgDRyBHRlZ48t0S6uSAcjgNGlldtYtDbQItOCvNjxtFX1jAbi8RHur0kWhO96bMxqDS2OlJT+HqCFRRMteCbZr7CgUeqm9kF2XCTUyCQYpe88b9/xwowf8clO/iMU9AOgZB88KaLcNd0CPdULrtIL0yO9OWYGrngW32IoIoE5xTHFedTRFWpUpWYsn6k9Vx1o7yQW4SPjaW7aemJGhm8yR1/E=
+    [gitserver.tools.svc]:2022 ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBKukF9lJxYjq24GXLfOSFWFsh9oK7eyYgsujtCd1eXDkmCHppbQRL+DtbcZGlk3TkXIK/qke9StQ6dGxOeRpd+g=
+- op: replace
+  path: /spec/resourceCustomizations
+  # Add health assessment for Applications to use them with sync waves for app-of-apps
+  # https://argo-cd.readthedocs.io/en/stable/operator-manual/upgrading/1.7-1.8/#health-assessment-of-argoprojioapplication-crd-has-been-removed
+  # https://github.com/argoproj/argo-cd/issues/3781
+  value: |
+    health.lua: |
+        hs = {}
+        hs.status = "Progressing"
+        hs.message = ""
+        if obj.status ~= nil then
+          if obj.status.health ~= nil then
+            hs.status = obj.status.health.status
+            if obj.status.health.message ~= nil then
+              hs.message = obj.status.health.message
+            end
+          end
+        end
+        return hs
+- op: replace
+  path: /spec/rbac
+  value:
+    defaultPolicy: role:readonly
+    policy: |
+      g, system:cluster-admins, role:admin
+      g, cluster-admins, role:admin
+      g, application-admins, role:admin
