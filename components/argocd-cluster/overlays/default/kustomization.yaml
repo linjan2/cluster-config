@@ -7,6 +7,7 @@ bases:
 resources:
 - application-oauth.yaml
 - application-argocd-applications.yaml
+- configmap-argocd-ssh-known-hosts-cm.yaml
 
 patches:
 - path: argocd-openshift-gitops-patch.yaml

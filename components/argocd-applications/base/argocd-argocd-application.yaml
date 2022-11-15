@@ -171,7 +171,7 @@ metadata:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: argocd-applications-argocd-application-argocd-server
+  name: openshift-gitops-openshift-gitops-argocd-server
 subjects:
 - kind: ServiceAccount
   name: argocd-applications-argocd-server

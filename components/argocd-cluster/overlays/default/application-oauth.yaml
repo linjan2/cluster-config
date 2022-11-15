@@ -9,13 +9,13 @@ spec:
     server: https://kubernetes.default.svc
   project: cluster
   source:
-    path: components/oauth/overlays/default
+    path: components/oauth/overlays/ldap
     repoURL: ssh://git@gitserver.tools.svc:2022/home/git/repos/cluster-config.git
     targetRevision: main
   syncPolicy:
     automated:
       allowEmpty: true
-      prune: false
-      selfHeal: false
+      # prune: false
+      # selfHeal: false
     syncOptions:
     - PrunePropagationPolicy=foreground

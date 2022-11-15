@@ -6,6 +6,7 @@ bases:
 
 resources:
 - application-dummy.yaml
+- configmap-argocd-ssh-known-hosts-cm.yaml
 
 patches:
 - path: argocd-argocd-applications-patch.yaml
